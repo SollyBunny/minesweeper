@@ -5,3 +5,4 @@ main.o:
 valgrind:
 	gcc main.c -g -Wall -Wextra -o minesweeper
 	valgrind ./minesweeper
+	-rm $(shell ls ./vgcore*)

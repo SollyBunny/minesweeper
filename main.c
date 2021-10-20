@@ -109,11 +109,11 @@ void recursefind(unsigned int x, unsigned int y, unsigned int i) {
 			
 			// render tile
 			if (grid[i].bomb == 0) {
-				printf("  ");
+				printf("\x1b[38;5;0m  ");
 				fflush(stdout);
 				recursefind(x, y, i);
 			} else {
-				printf("\x1b[38;5;%um%u ", tilecolor[grid[i].bomb], grid[i].bomb);
+				printf("\x1b[48;5;231m\x1b[38;5;%um%u ", tilecolor[grid[i].bomb], grid[i].bomb);
 			}
 
 			// iterate i, x, y
@@ -193,20 +193,20 @@ int main(void) {
 	while ((c = getchar()) != BREAK) {
 
 		//printf("\x1b[%u;%uH\x1b[24m\x1b[7m\x1b[25m", cursorpos / sizex + 1, (cursorpos % sizex) * 2 + 1);
-		printf("\x1b[%u;%uH\x1b[24m\x1b[7m\x1b[38;5;237m", cursorpos / sizex + 1, (cursorpos % sizex) * 2 + 1);
+		printf("\x1b[%u;%uH\x1b[24m\x1b[7m", cursorpos / sizex + 1, (cursorpos % sizex) * 2 + 1);
 		switch (grid[cursorpos].state) {
 			case 0:
-				printf("  ");
+				printf("\x1b[38;5;237m  ");
 				break;
 			case 1:
 				if (grid[cursorpos].bomb == 0) {
 					printf("\x1b[38;5;0m  ");
 				} else {
-					printf("\x1b[38;5;%um%u ", tilecolor[grid[cursorpos].bomb], grid[cursorpos].bomb);
+					printf("\x1b[48;5;231m\x1b[38;5;%um%u ", tilecolor[grid[cursorpos].bomb], grid[cursorpos].bomb);
 				}
 				break;
 			case 2:
-				printf("|>"); // gets converted to fputs?
+				printf("\x1b[48;5;231m\x1b[38;5;196m|>"); // gets converted to fputs?
 				break;
 		}
 		
@@ -274,11 +274,11 @@ int main(void) {
 					if (grid[cursorpos].bomb == 0) {
 						printf("  ");
 					} else {
-						printf("\x1b[48;5;%um%u ", tilecolor[grid[cursorpos].bomb], grid[cursorpos].bomb);
+						printf("\x1b[48;5;%um%u \x1b[48;5;0m", tilecolor[grid[cursorpos].bomb], grid[cursorpos].bomb);
 					}
 					break;
 				case 2:
-					printf("\x1b[48;5;196m|>");
+					printf("\x1b[48;5;196m|>\x1b[48;5;0m");
 					break;
 			}
 		
