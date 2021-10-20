@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <sys/ioctl.h>
 #include <termios.h>
+
 // Key codes
 #define BREAK 3
 
@@ -38,11 +39,9 @@ const unsigned int tilecolor[] = { 0,
 
 };
 
-void print() {
+/*void print() {
 
-	printf("\x1b[48;5;237m\x1b[?25l\x1b[2J\x1b[H\x1b[1m\x1b[7m");
-
-	/*unsigned int x = 0;
+	unsigned int x = 0;
 	for (unsigned int i = 0; ;++i) {
 
 		if (grid[i].bomb) {
@@ -60,9 +59,9 @@ void print() {
 			putchar('\n');
 		}
 
-	}*/
+	}
 
-}
+}*/
 
 unsigned int gettile(unsigned int x, unsigned int y, unsigned int i) {
 
@@ -85,8 +84,7 @@ unsigned int gettile(unsigned int x, unsigned int y, unsigned int i) {
 
 void recursefind(unsigned int x, unsigned int y, unsigned int i) {
 
-	// printf("\x1b[38;5;237m");
-	printf("\x1b[24m\x1b[7m\x1b[25m\x1b[48;5;5m");
+	// properly center x, y and i (-1 in both x & y)
 
 	i -= sizex;
 	i--;
@@ -96,91 +94,38 @@ void recursefind(unsigned int x, unsigned int y, unsigned int i) {
 	
 	for (unsigned int sy = 0; sy < 3; ++sy) {
 		for (unsigned int sx = 0; sx < 3; ++sx) {
+
+			// make sure it is not out of bounds
 			if (x >= sizex) goto recursefindloopend;
 			if (y >= sizey) goto recursefindloopend;
-			if (i >= size) goto recursefindloopend;
-			//if (gettile(x + sx, y + sy, i) == 10) continue;
+			//if (i >= size) goto recursefindloopend; // DEBUG
+
+			// check if already has been discoverred (in which case ignore to prevent infinate recusrion)
 			if (grid[i].state != 0) goto recursefindloopend; 
-			/*printf("\x1b[%u;%uH\x1b[4m\x1b[7m\x1b[5m", (y + sy + 1), (x * 2) + sx - 1);
+
+			// move to positin
+			printf("\x1b[%u;%uH", (y) + 1, ((x) * 2) + 1);
+			grid[i].state = 1; // discover tile
 			
-			printf("A");//"%d %d\n", x + sx, y + sy);*/
-			
-			printf("\x1b[%u;%uH", (y) + 1, ((x) * 2) - 1);
-			grid[i].state = 1;
+			// render tile
 			if (grid[i].bomb == 0) {
-				printf("\x1b[38;5;0m  ");
+				printf("  ");
 				fflush(stdout);
-				//recursefind(x, y, i);
+				recursefind(x, y, i);
 			} else {
-				printf("\x1b[48;5;231m\x1b[38;5;%um%u ", tilecolor[grid[i].bomb], grid[i].bomb);
+				printf("\x1b[38;5;%um%u ", tilecolor[grid[i].bomb], grid[i].bomb);
 			}
 
+			// iterate i, x, y
 			recursefindloopend:
 				i++;
 				x++;			
 		}
+		// iterate i, x, y
 		i += sizex - 3;
 		x -= 3;
 		y++;
 	}
-
-	/* // dw i made this with mutliple cursors
-	if (gettile(x + 1, y + 1, i + 1 + sizex) == 0) {
-		if (grid[i + 1 + sizex].state == 0) {
-			grid[i + 1 + sizex].state = 1;
-			recursefind(x + 1, y + 1, i + 1 + sizex);
-		}
-	}
-	
-	if (gettile(x    , y + 1, i + 0 + sizex) == 0) {
-		if (grid[i + 0 + sizex].state == 0) {
-			grid[i + 0 + sizex].state = 1;
-			recursefind(x    , y + 1, i + 0 + sizex);
-		}
-	}
-	
-	if (gettile(x - 1, y + 1, i - 1 + sizex) == 0) {
-		if (grid[i - 1 + sizex].state == 0) {
-			grid[i - 1 + sizex].state = 1;
-			recursefind(x - 1, y + 1, i - 1 + sizex);
-		}
-	}
-	
-	if (gettile(x + 1, y - 1, i + 1 - sizex) == 0) {
-		if (grid[i + 1 - sizex].state == 0) {
-			grid[i + 1 - sizex].state = 1;
-			recursefind(x + 1, y - 1, i + 1 - sizex);
-		}
-	}
-	
-	if (gettile(x    , y - 1, i + 0 - sizex) == 0) {
-		if (grid[i + 0 - sizex].state == 0) {
-			grid[i + 0 - sizex].state = 1;
-			recursefind(x    , y - 1, i + 0 - sizex);
-		}
-	}
-	
-	if (gettile(x - 1, y - 1, i - 1 - sizex) == 0) {
-		if (grid[i - 1 - sizex].state == 0) {
-			grid[i - 1 - sizex].state = 1;
-			recursefind(x - 1, y - 1, i - 1 - sizex);
-		}
-	}
-	
-	if (gettile(x + 1, y    , i + 1 + 0    ) == 0) {
-		if (grid[i + 1 + 0    ].state == 0) {
-			grid[i + 1 + 0    ].state = 1;
-			recursefind(x + 1, y    , i + 1 + 0    );
-		}
-	}
-	
-	if (gettile(x - 1, y    , i - 1 + 0    ) == 0) {
-		if (grid[i - 1 + 0    ].state == 0) {
-			grid[i - 1 + 0    ].state = 1;
-			recursefind(x - 1, y    , i - 1 + 0    );
-		}
-	}
-	*/
 	
 }
 
@@ -190,12 +135,11 @@ int main(void) {
 
 	struct winsize _w; // get term size
 	ioctl(0, TIOCGWINSZ, &_w);
-	sizey = _w.ws_row - 2; //TODO SET TO 1
+	sizey = _w.ws_row;
 	sizex = _w.ws_col / 2;
 	size = sizex * sizey;
 
 	// set terminal settins (dont echo characters / queue stdin / ignore ctrl-c )
-	//system("/bin/stty -echo -ixon -icanon time 5 min 1 intr undef");
 	struct termios term, restore;
 	tcgetattr(0, &term);
 	tcgetattr(0, &restore); // backup the original terminal state to restore later
@@ -207,9 +151,8 @@ int main(void) {
 	grid = malloc(size * sizeof(struct Tile));
 
 	for (unsigned int i = 0; i < size; ++i) {
-		grid[i].bomb = (rand() % 20 < 1) ? 9 : 0;
+		grid[i].bomb = (rand() % 10 < 1) ? 9 : 0;
 		grid[i].state = 0;
-		//printf("%u\n", grid[i].bomb);
 	}
 	//putchar('\n');
 
@@ -242,27 +185,28 @@ int main(void) {
 		
 	}
 
-	print();
+	printf("\x1b[48;5;237m\x1b[?25l\x1b[2J\x1b[H\x1b[1m\x1b[7m");
 	// mainloop
 	
 	char c;
 	goto mainloopstart;
 	while ((c = getchar()) != BREAK) {
 
-		printf("\x1b[%u;%uH\x1b[24m\x1b[7m\x1b[25m", cursorpos / sizex + 1, (cursorpos % sizex) * 2 + 1);
+		//printf("\x1b[%u;%uH\x1b[24m\x1b[7m\x1b[25m", cursorpos / sizex + 1, (cursorpos % sizex) * 2 + 1);
+		printf("\x1b[%u;%uH\x1b[24m\x1b[7m\x1b[38;5;237m", cursorpos / sizex + 1, (cursorpos % sizex) * 2 + 1);
 		switch (grid[cursorpos].state) {
 			case 0:
-				printf("\x1b[38;5;237m  ");
+				printf("  ");
 				break;
 			case 1:
 				if (grid[cursorpos].bomb == 0) {
 					printf("\x1b[38;5;0m  ");
 				} else {
-					printf("\x1b[48;5;231m\x1b[38;5;%um%u ", tilecolor[grid[cursorpos].bomb], grid[cursorpos].bomb);
+					printf("\x1b[38;5;%um%u ", tilecolor[grid[cursorpos].bomb], grid[cursorpos].bomb);
 				}
 				break;
 			case 2:
-				printf("\x1b[48;5;231m\x1b[38;5;196m|>"); // gets converted to fputs?
+				printf("|>"); // gets converted to fputs?
 				break;
 		}
 		
@@ -320,20 +264,21 @@ int main(void) {
 		mainloopstart:
 
 		
-			printf("\x1b[%u;%uH\x1b[4m\x1b[7m\x1b[5m", cursorpos / sizex + 1, (cursorpos % sizex) * 2 + 1);
+			//printf("\x1b[%u;%uH\x1b[4m\x1b[7m\x1b[5m", cursorpos / sizex + 1, (cursorpos % sizex) * 2 + 1);//
+			printf("\x1b[%u;%uH\x1b[4m\x1b[7m\x1b[38;5;231m", cursorpos / sizex + 1, (cursorpos % sizex) * 2 + 1);
 			switch (grid[cursorpos].state) {
 				case 0:
-					printf("\x1b[38;5;231m  ");
+					printf("  ");
 					break;
 				case 1:
 					if (grid[cursorpos].bomb == 0) {
-						printf("\x1b[38;5;231m  ");
+						printf("  ");
 					} else {
-						printf("\x1b[38;5;231m\x1b[48;5;%um%u \x1b[48;5;0m", tilecolor[grid[cursorpos].bomb], grid[cursorpos].bomb);
+						printf("\x1b[48;5;%um%u ", tilecolor[grid[cursorpos].bomb], grid[cursorpos].bomb);
 					}
 					break;
 				case 2:
-					printf("\x1b[38;5;231m\x1b[48;5;196m|>\x1b[48;5;0m");
+					printf("\x1b[48;5;196m|>");
 					break;
 			}
 		
@@ -342,7 +287,7 @@ int main(void) {
 	end:
 
 		tcsetattr(0, TCSANOW, &restore); // restore terminal state
-		printf("\x1b[?25h\x1b[0m\n");
+		printf("\x1b[0m\x1b[%u;0H\x1b[2K\x1b[?25h", sizey);
 
 		return 0;
 
