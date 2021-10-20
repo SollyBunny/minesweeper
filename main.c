@@ -6,6 +6,7 @@
 #include <sys/ioctl.h>
 
 unsigned int sizex, sizey, size;
+unsigned int cursorpos;
 
 struct Tile {
 	unsigned int bomb;
@@ -13,8 +14,11 @@ struct Tile {
 };
 struct Tile * grid;
 
-char digittoint(unsigned int a) {
-	switch(a) {
+char puttile(i) {
+	if (grid[i].bomb) {
+		putchar('@')
+	}
+	switch(grid[i].next) {
 		case 0: return ' ';
 		case 1: return '1';
 		case 2: return '2';
@@ -79,6 +83,8 @@ int main(void) {
 	sizex = _w.ws_col / 2;
 	size = sizex * sizey;
 
+	cursorpos = 0;
+
 	grid = malloc(size * sizeof(struct Tile));
 
 	for (unsigned int i = 0; i < size; ++i) {
@@ -119,6 +125,9 @@ int main(void) {
 	}
 
 	print();
+	// mainloop
+
+
 
 	return 0;
 }
