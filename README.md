@@ -1,0 +1,2 @@
+# minesweeper
+minesweeper in c
